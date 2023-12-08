@@ -2,10 +2,11 @@
 import requests
 import time
 import json
+import math
 from prettytable import PrettyTable
 
 # Na pasta do projeto há um ficheiro "external_files" que tem documentos de texto para evitar poluir o código principal. Todas as variáveis que terminarem em "_python_files" vêm desse ficheiro externo.
-from external_files import categories_python_file
+from external_files import categories_python_file, menu
 
 # Esta função espera "s" segundos antes de executar a linha de código seguinte (esta função apenas serve para propósitos estéticos e de interatividade para o programa)
 def wait(s):
@@ -20,6 +21,10 @@ def restart():
     wait(3)
     main()
 
+def points_distance(lat1, lon1, lat2, lon2):
+    earth_radius = 6.37781*10^6 # Valor em metros (m)
+    lat_offset = abs(lat1-lat2)
+    lon_offset = abs(lon1-lon2)
 def main():
     #lon = input("Insira a sua longitude: ")
     #lat = input("Insira a sua latitude: ")
@@ -29,16 +34,20 @@ def main():
     lat = "40"
     radius = "5000"
 
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------------------")
+
+    print(menu)
+
     # Este while server apenas para garantir que as variáveis lon, lat e radius são convertíveis para float sem dar erro.
     while not (is_number(lon) and is_number(lat) and is_number(radius)):
         if not is_number(lon):
-            print("⚠ A longitude introduza é inválida! ⚠")
+            print("\u26A0 A longitude introduza é inválida! \u26A0")
             lon = input("Insira a sua longitude: ")
         if not is_number(lat):
-            print("⚠ A latitude introduza é inválida! ⚠")
+            print("\u26A0 A latitude introduza é inválida! \u26A0")
             lat = input("Insira a sua latitude: ")
         if not is_number(radius):
-            print("⚠ O raio introduzido é inválido! ⚠")
+            print("\u26A0 O raio introduzido é inválido! \u26A0")
             radius = input("Insira o raio: ")
 
     float(lon)
@@ -72,7 +81,7 @@ def main():
     categories = "accommodation,catering"
 
     #url = f"https://api.geoapify.com/v2/places?categories={categories}" + "&apiKey=041fa32a7f874d2594bd27b29a1a39fd" + f"&filter=circle:{lon},{lat},{radius}"
-    url = "https://api.geoapify.com/v2/places?categories=catering,accommodation&apiKey=041fa32a7f874d2594bd27b29a1a39fd&filter=circle:-9.14,38.72,5000"
+    url = "https://api.geoapify.com/v2/places?categories=service&apiKey=041fa32a7f874d2594bd27b29a1a39fd&filter=circle:-8.483349,40.786700,1000"
 
     # A variável resp resulta da resposta da API conforme os dados introduzidos (categories, filter, lon, lat, radius, etc...)
     resp = requests.get(f"{url}")
@@ -91,7 +100,7 @@ def main():
     
     Distrito (county), Concelho (city), Freguesia (district)
     '''
-    table = PrettyTable(["Nome", "País", "Distrito", "Concelho", "Freguesia", "Localização", "Distância"]) 
+    table = PrettyTable(["Nome", "\u2690 País", "\U0001F3DB  Distrito", "\U0001F3E2 Concelho", "\U0001F3D8  Freguesia", "\U0001F79C  Localização", "Distância"]) 
 
     # Este ciclo for percorre as propriedades da API de forma a encontrar o que quer e adicionar isso a uma tabela através do módulo "prettytable".
     for i in range(len(data_dict["features"])):
