@@ -1,6 +1,8 @@
 # Módulos importados
 import requests
 import time
+import json
+from prettytable import PrettyTable
 
 # Na pasta do projeto há um ficheiro "external_files" que tem documentos de texto para evitar poluir o código principal. Todas as variáveis que terminarem em "_python_files" vêm desse ficheiro externo.
 from external_files import categories_python_file
@@ -12,7 +14,6 @@ def wait(s):
 # Esta função verifica se uma string é um número ou não (também funciona para número negativos, ao contrário da função ".isdigit()")
 def is_number(number):
     return number.lstrip("-").isdigit()
-
 def restart():
     wait(1)
     print("Reiniciando programa...\n")
@@ -70,17 +71,45 @@ def main():
 
     categories = "accommodation,catering"
 
-    url = f"https://api.geoapify.com/v2/places?categories={categories}" + "&apiKey=041fa32a7f874d2594bd27b29a1a39fd" + f"&filter=circle:{lon},{lat},{radius}"
+    #url = f"https://api.geoapify.com/v2/places?categories={categories}" + "&apiKey=041fa32a7f874d2594bd27b29a1a39fd" + f"&filter=circle:{lon},{lat},{radius}"
+    url = "https://api.geoapify.com/v2/places?categories=catering,accommodation&apiKey=041fa32a7f874d2594bd27b29a1a39fd&filter=circle:-9.14,38.72,5000"
 
+    # A variável resp resulta da resposta da API conforme os dados introduzidos (categories, filter, lon, lat, radius, etc...)
     resp = requests.get(f"{url}")
+
+    # REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR
     print("resp.status_code:", resp.status_code)  # deve ser 200
+    # REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR
 
-    data_dict = resp.json()
+    # A variável data_dict resulta da transformação da string devolvida pela API em uma estrutura de dados do Python, neste caso, um dicionário.
+    data_dict = json.loads(resp.text)
 
+    '''
     # REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR
     print("resp.text:\n", resp.text,"\n\n\n\n\n\n\n\n\n\n") # Imprime tudo o que a API devolve.
     # REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR REMOVER ANTES DE ENVIAR
-    for item in data_dict:
-        print(data_dict.get(features.get(city)))
+    
+    Distrito (county), Concelho (city), Freguesia (district)
+    '''
+    table = PrettyTable(["Nome", "País", "Distrito", "Concelho", "Freguesia", "Localização", "Distância"]) 
 
+    # Este ciclo for percorre as propriedades da API de forma a encontrar o que quer e adicionar isso a uma tabela através do módulo "prettytable".
+    for i in range(len(data_dict["features"])):
+        properties = data_dict["features"][i]["properties"]
+        # Se o elemento i tiver a propriedade "name", então o programa adiciona as respetivas informações, caso contrário, ignora.
+        if "name" in properties:
+            name = properties["name"]
+            properties_dict = {"country": None, "county": None, "city": None, "district": None, "lat": None, "lon": None}
+            for item in ("country", "county", "city", "district", "lat", "lon"):
+                if item not in properties:
+                    properties_dict[item] = "Sem informação"
+                else:
+                    properties_dict[item] = properties[item]
+
+            table.add_row([name, properties_dict["country"], properties_dict["county"], properties_dict["city"], properties_dict["district"], f'Lat: {properties["lat"]} | Lon: {properties["lon"]}', 'Distância'])
+            table.add_row(["","","","","","",""])
+
+    # Elimina a última linha da tabela de forma a que não fique uma linha vazia (uma vez que o ciclo for anterior adicionava uma linha vazia após cada elemento).
+    table.del_row(len(table._rows)-1)
+    print(table)
 main()
