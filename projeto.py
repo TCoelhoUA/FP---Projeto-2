@@ -2,8 +2,8 @@
 import requests
 import time
 import json
-import math
 from prettytable import PrettyTable
+import csv
 
 # Na pasta do projeto há um ficheiro "external_files" que tem documentos de texto para evitar poluir o código principal. Todas as variáveis que terminarem em "_python_files" vêm desse ficheiro externo.
 from external_files import categories_python_file, welcome, menu, program_details
@@ -127,7 +127,9 @@ def main():
         # Se a atração i tiver a propriedade "name", então o programa adiciona as respetivas informações (predefinidas como None), caso contrário, ignora.
         if "name" in properties:
             name = properties["name"]
-            properties_dict = {"country": None, "county": None, "city": None, "district": None, "lat": None, "lon": None, "distance": None}
+            attractions_names = []
+            attractions_names.append(name)
+            properties_dict = {"name": name, "country": None, "county": None, "city": None, "district": None, "lat": None, "lon": None, "distance": None}
             total_attractions += 1
 
             # Este ciclo for verifica se, por cada propriedade, existe essa informação no ficheiro JSON recebido. Se sim, então o valor associado à key do dicionário fica o que vem na API, caso contrário fica "Sem informação".
@@ -150,4 +152,31 @@ def main():
     table.del_row(len(table._rows)-1)
     print(table)
     print(f"""\nNúmero total de atrações detectadas: {total_attractions}\nDistância média das atrações: {average_distance}m""")
+
+    choice = input("Deseja exportar dados sobre as atrações para CSV? (s/n)\n=> ").strip().lower()
+    if choice == "s":
+        with open("CSV_Exported.csv", "w") as fileobj:
+            writer = csv.writer(fileobj)
+            writer.writerow(["Nome", "País", "Distrito", "Concelho", "Freguesia", "Latitude", "Longitude", "Distância"])
+
+            for attraction in range(total_attractions+1):
+                properties = data_dict["features"][attraction]["properties"]
+                if "name" in properties:
+                    name = properties["name"]
+                    properties_dict = {"name": name, "country": None, "county": None, "city": None, "district": None, "lat": None, "lon": None, "distance": None}
+
+                    for item in ("country", "county", "city", "district", "lat", "lon", "distance"):
+                        if item not in properties:
+                            properties_dict[item] = "Sem informação"
+                        else:
+                            properties_dict[item] = properties[item]
+
+                    writer.writerow([name, properties_dict["country"], properties_dict["county"], properties_dict["city"], properties_dict["district"], f'{properties["lat"]}',f'{properties["lon"]}', f'{properties_dict["distance"]}'])
+
+
+    choice = input("Deseja fazer outra pesquisa? (s/n)\n=> ").strip().lower() # Como a variável choice anterior não irá mais ser usada, usámos o mesmo nome para definir este input
+    if choice == "s":
+        restart()
+    
+
 main()
