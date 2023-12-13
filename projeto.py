@@ -22,6 +22,13 @@ def restart():
     wait(3)
     main()
 
+def has_digit(file_name):
+    for digit in ("\\", "/", "|", "?", "<", ">", "*", ":", "“"):
+        if digit in file_name:
+            file_name = input("O nome do ficheiro não pode conter (\, /, |, ?, <, >, *, :, “)\nInsira um nome para o ficheiro: ")
+            has_digit(file_name)
+    return True, file_name
+
 def main():
     #lon = input("Insira a sua longitude: ")
     #lat = input("Insira a sua latitude: ")
@@ -155,7 +162,10 @@ def main():
 
     choice = input("Deseja exportar dados sobre as atrações para CSV? (s/n)\n=> ").strip().lower()
     if choice == "s":
-        with open("CSV_Exported.csv", "w") as fileobj:
+        file_name = input("Insira um nome para o ficheiro: ")
+        bol, file_name = has_digit(file_name) # Uma vez que a função has_digit dá return de um valor boleano (bol) e de um file_name válido, temos de "guardar" o return que ela dá com bol, file_name
+
+        with open(f"{file_name}.csv", "w") as fileobj:
             writer = csv.writer(fileobj)
             writer.writerow(["Nome", "País", "Distrito", "Concelho", "Freguesia", "Latitude", "Longitude", "Distância"])
 
@@ -172,7 +182,7 @@ def main():
                             properties_dict[item] = properties[item]
 
                     writer.writerow([name, properties_dict["country"], properties_dict["county"], properties_dict["city"], properties_dict["district"], f'{properties["lat"]}',f'{properties["lon"]}', f'{properties_dict["distance"]}'])
-
+        print(f"O ficheiro {file_name}.csv foi criado na pasta do projeto.")
 
     choice = input("Deseja fazer outra pesquisa? (s/n)\n=> ").strip().lower() # Como a variável choice anterior não irá mais ser usada, usámos o mesmo nome para definir este input
     if choice == "s":
