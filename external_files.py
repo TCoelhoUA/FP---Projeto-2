@@ -670,5 +670,8 @@ menu = """
 """
 
 program_details = """
-ESCREVER TEXTO DEPOIS DO PROGRAMA ESTAR FINALIZADO
+                                                         Este programa tem como objetivo ajudar o utilizador a encontrar um ponto do seu interesse.
+                            O utilizador terá de introduzir a localização de partida (Latitude e Longitude), a distância máxima a percorrer (em km) e as categorias de interesse.
+                               Para além de receber a informação acerca dos pontos de encontro o utilizador pode também exportar essas mesmas informações para um ficheiro CSV.
+
 """
