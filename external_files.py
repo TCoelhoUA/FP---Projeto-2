@@ -665,6 +665,7 @@ menu = """
                                                                           |      1 - Como funciona o programa?                 |
                                                                           |      2 - Ver todas as categorias disponíveis.      |
                                                                           |      3 - Planear viajem.                           |
+                                                                          |      4 - Sair                                      |
                                                                           |                                                    |
                                                                           +----------------------------------------------------+ 
 """
