@@ -84,15 +84,28 @@ def show_main_categories(categories_python_file):
 
 # Esta função verifica se uma categoria existe apenas 1 vez na lista de categorias, se assim for então não existe mais subcategorias nessa categoria.
 def check_subcategory(appended_category, final_category, categories_python_file):
-    a = 0
     if appended_category == "":
         return False
     
+    sub = 0 # A variável sub é referente ao número de subcategorias (incluindo a categoria principal)
+            # Logo, para a função retornar True, no final da função o valor de sub tem de ser maior que 1 ( sub > 1)
+
     for category in categories_python_file:
+        # Este if verifica se a final_category está na category e exclui caso seja igual à category em si (nesse caso não tem subcategoria)
         if final_category in category:
-            a += 1
-    
-    if a > 1:
+            min_length = min(len(final_category), len(category)) # Verifica qual string tem menor tamanho
+
+            a = 0
+            # Este ciclo for verifica se a final_category está no inicio da category.
+            # Se isto não fosse verificado, categorias como commercial.food_and_drink.ice_cream , catering.cafe.ice_cream , catering.ice_cream dariam conflito.
+            for char in range(min_length):
+                if final_category[char] == category[char]:
+                    a += 1
+
+            if a == min_length:
+                sub += 1
+
+    if sub > 1:
         return True
     
     return False
